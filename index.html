@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portofolio Naufal</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: #0f172a;
+    color: white;
+}
+
+/* NAVBAR */
+nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 50px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+}
+
+nav h1 {
+    color: #38bdf8;
+}
+
+nav a {
+    margin-left: 20px;
+    text-decoration: none;
+    color: white;
+}
+
+/* HERO */
+.hero {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.hero h2 {
+    font-size: 40px;
+}
+
+.hero span {
+    color: #38bdf8;
+}
+
+.hero p {
+    margin-top: 10px;
+    opacity: 0.7;
+}
+
+/* SECTION */
+section {
+    padding: 50px;
+}
+
+.title {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #38bdf8;
+}
+
+/* CARD */
+.card {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* GRID */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+    gap: 20px;
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 20px;
+    opacity: 0.5;
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav>
+    <h1>Naufal</h1>
+    <div>
+        <a href="#about">About</a>
+        <a href="#project">Project</a>
+        <a href="#contact">Contact</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+    <h2>Halo, Saya <span>Naufal</span> 👋</h2>
+    <p>IT Support | Networking | Web Developer</p>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+    <h2 class="title">Tentang Saya</h2>
+    <div class="card">
+        <p>Mahasiswa Sistem Informasi dengan pengalaman di bidang IT Support dan Networking. 
+        Terbiasa melakukan troubleshooting jaringan, konfigurasi perangkat, serta pengembangan website menggunakan Laravel.</p>
+    </div>
+</section>
+
+<!-- SKILLS -->
+<section>
+    <h2 class="title">Keahlian</h2>
+    <div class="grid">
+        <div class="card">Networking (Cisco & Mikrotik)</div>
+        <div class="card">Troubleshooting Hardware & Software</div>
+        <div class="card">Laravel & Java</div>
+        <div class="card">Microsoft Office</div>
+    </div>
+</section>
+
+<!-- PROJECT -->
+<section id="project">
+    <h2 class="title">Project</h2>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Infrastruktur Jaringan</h3>
+            <p>Mengelola WiFi gedung dan troubleshooting jaringan saat magang di Kominfotik.</p>
+        </div>
+
+        <div class="card">
+            <h3>Troubleshooting Case</h3>
+            <p>Menangani masalah koneksi internet, router, dan jaringan internal.</p>
+        </div>
+
+        <div class="card">
+            <h3>Website Laravel</h3>
+            <p>Website dengan fitur export PDF dan visualisasi data (chart).</p>
+        </div>
+    </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+    <h2 class="title">Kontak</h2>
+    <div class="card">
+        <p>Email: naufaladitya4205@gmail.com</p>
+        <p>LinkedIn: linkedin.com/in/naufal-aditya</p>
+    </div>
+</section>
+
+<footer>
+    <p>© 2026 Naufal Portfolio</p>
+</footer>
+
+</body>
+</html>
