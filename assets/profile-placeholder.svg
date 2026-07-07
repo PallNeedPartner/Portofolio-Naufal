@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <rect width="240" height="240" fill="#1c1712"/>
+  <circle cx="120" cy="95" r="42" fill="none" stroke="#f2a93b" stroke-width="2"/>
+  <path d="M50 210 C 50 150, 190 150, 190 210" fill="none" stroke="#f2a93b" stroke-width="2"/>
+  <text x="120" y="102" font-family="IBM Plex Mono, monospace" font-size="34" fill="#f2ede2" text-anchor="middle">NA</text>
+</svg>

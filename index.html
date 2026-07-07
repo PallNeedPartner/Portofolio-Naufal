@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naufal Aditya Putra — IT Support &amp; Network Engineer</title>
+<meta name="description" content="Portofolio Naufal Aditya Putra — IT Support, Networking, dan Web Developer.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#14100c;
+    --bg-panel:#1c1712;
+    --bg-panel-2:#211b15;
+    --ink:#f2ede2;
+    --ink-dim:#b8ae9e;
+    --ink-faint:#7a7266;
+    --amber:#f2a93b;
+    --teal:#5fa89f;
+    --led:#6bcb77;
+    --line:#372f26;
+    --mono:'IBM Plex Mono', ui-monospace, monospace;
+    --sans:'IBM Plex Sans', system-ui, sans-serif;
+    --radius:3px;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:auto; }
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-weight:300;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  a{ color:inherit; text-decoration:none; }
+  ::selection{ background:var(--amber); color:#14100c; }
+
+  .noise{
+    position:fixed; inset:0; pointer-events:none; z-index:1;
+    opacity:.035; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .wrap{ max-width:1080px; margin:0 auto; padding:0 32px; }
+  .eyebrow{
+    font-family:var(--mono); font-size:12px; letter-spacing:.14em;
+    color:var(--amber); text-transform:uppercase; display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow::before{ content:''; width:6px; height:6px; border-radius:50%; background:var(--led); box-shadow:0 0 6px var(--led); }
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 32px;
+    background:rgba(20,16,12,.72);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    font-family:var(--mono);
+  }
+  nav .logo{ font-size:14px; color:var(--ink); }
+  nav .logo span{ color:var(--amber); }
+  nav .links{ display:flex; gap:28px; font-size:13px; color:var(--ink-dim); }
+  nav .links a{ position:relative; transition:color .25s; }
+  nav .links a:hover{ color:var(--amber); }
+  nav .links a::before{ content:'> '; color:var(--ink-faint); }
+  nav .status{ font-size:11px; color:var(--ink-faint); display:flex; align-items:center; gap:6px; }
+  nav .status i{ width:6px; height:6px; border-radius:50%; background:var(--led); display:inline-block; box-shadow:0 0 5px var(--led); animation:blink 2.4s infinite; }
+  @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
+  @media (max-width:720px){ nav .links{ display:none; } }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height:100vh;
+    display:flex; align-items:center;
+    padding:120px 0 60px;
+    position:relative;
+  }
+  .hero-grid{
+    display:grid; grid-template-columns:1.3fr .7fr; gap:56px; align-items:center; width:100%;
+  }
+  @media (max-width:860px){ .hero-grid{ grid-template-columns:1fr; } }
+
+  .terminal{
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    overflow:hidden;
+    box-shadow:0 30px 60px -30px rgba(0,0,0,.6);
+  }
+  .terminal-bar{
+    display:flex; align-items:center; gap:8px;
+    padding:10px 14px;
+    background:var(--bg-panel-2);
+    border-bottom:1px solid var(--line);
+    font-family:var(--mono); font-size:11px; color:var(--ink-faint);
+  }
+  .terminal-bar .dot{ width:9px; height:9px; border-radius:50%; }
+  .terminal-body{
+    padding:26px 24px 32px;
+    font-family:var(--mono);
+    font-size:14.5px;
+    min-height:220px;
+  }
+  .terminal-body .line{ margin-bottom:6px; white-space:pre-wrap; }
+  .terminal-body .prompt{ color:var(--teal); }
+  .terminal-body .out{ color:var(--ink); }
+  .terminal-body .dim{ color:var(--ink-faint); }
+  .cursor{ display:inline-block; width:8px; height:16px; background:var(--amber); vertical-align:-3px; animation:blink 1s steps(1) infinite; }
+
+  .hero-actions{ display:flex; gap:14px; margin-top:26px; flex-wrap:wrap; }
+  .btn{
+    font-family:var(--mono); font-size:13px; padding:12px 20px; border-radius:3px;
+    border:1px solid var(--line); transition:all .25s;
+  }
+  .btn-primary{ background:var(--amber); color:#14100c; border-color:var(--amber); font-weight:500; }
+  .btn-primary:hover{ background:#ffbf5e; }
+  .btn-ghost{ color:var(--ink-dim); }
+  .btn-ghost:hover{ border-color:var(--amber); color:var(--amber); }
+
+  /* ID CARD */
+  .id-card{
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:22px;
+    position:relative;
+    box-shadow:0 30px 60px -30px rgba(0,0,0,.6);
+  }
+  .id-card::after{
+    content:'';
+    position:absolute; top:-10px; left:50%; transform:translateX(-50%);
+    width:46px; height:16px; background:var(--bg-panel-2); border:1px solid var(--line); border-radius:4px;
+  }
+  .id-photo{
+    width:100%; aspect-ratio:1/1; border-radius:6px; overflow:hidden;
+    border:1px solid var(--line); margin-bottom:16px; background:var(--bg-panel-2);
+  }
+  .id-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .id-name{ font-family:var(--mono); font-size:16px; color:var(--ink); }
+  .id-role{ font-size:12.5px; color:var(--ink-dim); margin-top:4px; }
+  .id-meta{ margin-top:16px; padding-top:16px; border-top:1px dashed var(--line); font-family:var(--mono); font-size:11px; color:var(--ink-faint); display:flex; justify-content:space-between; }
+  .id-meta .granted{ color:var(--led); }
+  .id-barcode{ margin-top:14px; height:26px; background:repeating-linear-gradient(90deg, var(--ink-faint) 0 2px, transparent 2px 5px); opacity:.5; border-radius:2px; }
+
+  /* ---------- SECTIONS ---------- */
+  section{ padding:96px 0; position:relative; }
+  .section-head{ margin-bottom:44px; }
+  .section-head h2{
+    font-family:var(--mono); font-size:26px; font-weight:500; color:var(--ink); margin-top:8px;
+  }
+  .section-head h2 span{ color:var(--ink-faint); }
+
+  .reveal{ opacity:0; transform:translateY(28px); transition:opacity .7s ease, transform .7s ease; }
+  .reveal.in-view{ opacity:1; transform:translateY(0); }
+
+  /* ABOUT — system info panel */
+  .sysinfo{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:8px;
+    display:grid; grid-template-columns:1fr 1fr; gap:0;
+  }
+  @media (max-width:720px){ .sysinfo{ grid-template-columns:1fr; } }
+  .sysinfo-row{ padding:22px 26px; border-bottom:1px solid var(--line); }
+  .sysinfo-row:nth-child(odd){ border-right:1px solid var(--line); }
+  @media (max-width:720px){ .sysinfo-row:nth-child(odd){ border-right:none; } }
+  .sysinfo-row .k{ font-family:var(--mono); font-size:11px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.08em; }
+  .sysinfo-row .v{ margin-top:6px; font-size:15px; color:var(--ink); }
+  .sysinfo-row.full{ grid-column:1/-1; border-right:none; }
+
+  /* SKILLS — patch panel ports */
+  .panel{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:8px; padding:8px;
+  }
+  .ports{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:8px; }
+  .port{
+    background:var(--bg-panel-2); border:1px solid var(--line); border-radius:6px;
+    padding:16px 18px; display:flex; align-items:center; gap:14px;
+  }
+  .port .jack{
+    width:34px; height:34px; border-radius:5px; background:var(--bg); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:10px; color:var(--ink-faint); flex-shrink:0;
+    position:relative;
+  }
+  .port .jack i{ position:absolute; top:5px; right:5px; width:5px; height:5px; border-radius:50%; background:var(--led); box-shadow:0 0 4px var(--led); }
+  .port .name{ font-size:14px; color:var(--ink); }
+  .port .sub{ font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); margin-top:2px; }
+
+  /* PROJECTS — rack units */
+  .rack{ display:flex; flex-direction:column; gap:14px; }
+  .unit{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:8px;
+    padding:26px 28px; display:grid; grid-template-columns:150px 1fr; gap:24px;
+  }
+  @media (max-width:720px){ .unit{ grid-template-columns:1fr; } }
+  .unit-tag{ font-family:var(--mono); font-size:11px; color:var(--ink-faint); }
+  .unit-tag .id{ color:var(--ink-dim); display:block; margin-bottom:8px; }
+  .status-chip{
+    display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:10.5px;
+    padding:4px 9px; border-radius:20px; border:1px solid var(--line); text-transform:uppercase; letter-spacing:.06em;
+  }
+  .status-chip.deployed{ color:var(--led); border-color:rgba(107,203,119,.4); }
+  .status-chip.completed{ color:var(--teal); border-color:rgba(95,168,159,.4); }
+  .status-chip i{ width:5px; height:5px; border-radius:50%; background:currentColor; box-shadow:0 0 5px currentColor; }
+  .unit h3{ font-family:var(--mono); font-size:17px; font-weight:500; color:var(--ink); }
+  .unit p{ margin-top:10px; font-size:14.5px; color:var(--ink-dim); max-width:60ch; }
+  .stack{ margin-top:14px; display:flex; flex-wrap:wrap; gap:8px; }
+  .stack span{ font-family:var(--mono); font-size:11px; color:var(--ink-faint); border:1px solid var(--line); border-radius:3px; padding:3px 8px; }
+  .unit-links{ margin-top:14px; display:flex; gap:16px; }
+  .unit-links a{ font-family:var(--mono); font-size:12px; color:var(--amber); border-bottom:1px solid transparent; }
+  .unit-links a:hover{ border-color:var(--amber); }
+
+  /* CONTACT — ticket */
+  .ticket{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:8px;
+    padding:36px; display:grid; grid-template-columns:1fr 1fr; gap:28px;
+  }
+  @media (max-width:720px){ .ticket{ grid-template-columns:1fr; } }
+  .ticket .field .k{ font-family:var(--mono); font-size:11px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.08em; }
+  .ticket .field .v{ margin-top:8px; font-size:15px; }
+  .ticket .field .v a:hover{ color:var(--amber); }
+
+  footer{
+    padding:34px 0; text-align:center; font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);
+    border-top:1px solid var(--line);
+  }
+  footer .led{ color:var(--led); }
+
+  @media (prefers-reduced-motion:reduce){
+    .reveal{ transition:none; opacity:1; transform:none; }
+    .cursor, nav .status i{ animation:none; }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="noise"></div>
+
+<nav>
+  <div class="logo">naufal<span>@</span>portfolio</div>
+  <div class="links">
+    <a href="#about">about</a>
+    <a href="#skills">skills</a>
+    <a href="#projects">projects</a>
+    <a href="#contact">contact</a>
+  </div>
+  <div class="status"><i></i> online</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero wrap">
+  <div class="hero-grid">
+    <div>
+      <div class="eyebrow">system online</div>
+      <div class="terminal" style="margin-top:18px;">
+        <div class="terminal-bar">
+          <span class="dot" style="background:#e0605a;"></span>
+          <span class="dot" style="background:#e0b95a;"></span>
+          <span class="dot" style="background:#6bcb77;"></span>
+          <span style="margin-left:8px;">naufal@portfolio: ~</span>
+        </div>
+        <div class="terminal-body" id="termBody"></div>
+      </div>
+      <div class="hero-actions">
+        <a href="#projects" class="btn btn-primary">lihat_project.sh</a>
+        <a href="#contact" class="btn btn-ghost">hubungi --now</a>
+      </div>
+    </div>
+
+    <div class="id-card">
+      <div class="id-photo">
+        <img src="assets/profile.jpg" alt="Foto profil Naufal Aditya Putra" onerror="this.src='assets/profile-placeholder.svg'">
+      </div>
+      <div class="id-name">Naufal Aditya Putra</div>
+      <div class="id-role">IT Support &middot; Networking &middot; Web Developer</div>
+      <div class="id-meta">
+        <span>ID: NAP-2026</span>
+        <span class="granted">ACCESS GRANTED</span>
+      </div>
+      <div class="id-barcode"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="wrap reveal">
+  <div class="section-head">
+    <div class="eyebrow">./about</div>
+    <h2>System <span>Info</span></h2>
+  </div>
+  <div class="sysinfo">
+    <div class="sysinfo-row">
+      <div class="k">Program Studi</div>
+      <div class="v">S1 Sistem &amp; Teknologi Informasi — UHAMKA</div>
+    </div>
+    <div class="sysinfo-row">
+      <div class="k">Uptime</div>
+      <div class="v">Aktif di bidang IT sejak 2022</div>
+    </div>
+    <div class="sysinfo-row">
+      <div class="k">Fokus</div>
+      <div class="v">Jaringan Komputer &amp; IT Support</div>
+    </div>
+    <div class="sysinfo-row">
+      <div class="k">Sekunder</div>
+      <div class="v">Web Development (Laravel), Data/AI dasar</div>
+    </div>
+    <div class="sysinfo-row full">
+      <div class="k">Deskripsi</div>
+      <div class="v" style="color:var(--ink-dim);">
+        Terbiasa mengelola infrastruktur jaringan, melakukan troubleshooting perangkat keras/lunak, dan membangun
+        aplikasi web dari nol. Selain kerja teknis, punya jam terbang komunikasi tinggi dari pengalaman hospitality
+        dan event operasional skala ribuan orang — jadi terbiasa kerja presisi di bawah tekanan.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" class="wrap reveal">
+  <div class="section-head">
+    <div class="eyebrow">./skills</div>
+    <h2>Patch <span>Panel</span></h2>
+  </div>
+  <div class="panel">
+    <div class="ports">
+      <div class="port"><div class="jack">RJ45<i></i></div><div><div class="name">Networking</div><div class="sub">Cisco &middot; Mikrotik dasar</div></div></div>
+      <div class="port"><div class="jack">SYS<i></i></div><div><div class="name">Troubleshooting</div><div class="sub">Hardware &amp; software</div></div></div>
+      <div class="port"><div class="jack">SRV<i></i></div><div><div class="name">Server &amp; Cloud</div><div class="sub">Nutanix &middot; Ubuntu Server</div></div></div>
+      <div class="port"><div class="jack">SEC<i></i></div><div><div class="name">Dasar Keamanan Siber</div><div class="sub">Linux hardening (OverTheWire)</div></div></div>
+      <div class="port"><div class="jack">WEB<i></i></div><div><div class="name">Web Development</div><div class="sub">Laravel &middot; PHP</div></div></div>
+      <div class="port"><div class="jack">AI</div><div><div class="name">NLP / Machine Learning</div><div class="sub">TF-IDF &middot; IndoBERT (Python)</div></div></div>
+      <div class="port"><div class="jack">OFC<i></i></div><div><div class="name">Microsoft Office</div><div class="sub">Word &middot; Excel &middot; PowerPoint</div></div></div>
+      <div class="port"><div class="jack">COM<i></i></div><div><div class="name">Komunikasi &amp; Tim</div><div class="sub">Operasional lapangan skala besar</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" class="wrap reveal">
+  <div class="section-head">
+    <div class="eyebrow">./projects</div>
+    <h2>Rack <span>Units</span></h2>
+  </div>
+  <div class="rack">
+
+    <div class="unit">
+      <div class="unit-tag"><span class="id">RACK 01</span><span class="status-chip deployed"><i></i>deployed</span></div>
+      <div>
+        <h3>FakeShield AI — Deteksi Hoax Bahasa Indonesia</h3>
+        <p>
+          Aplikasi web deteksi berita palsu yang membandingkan model TF-IDF + Logistic Regression dengan
+          IndoBERT hasil fine-tuning, dilatih di Google Colab (GPU T4) karena laptop kerja tanpa GPU.
+          Dibangun ulang di Streamlit dengan halaman prediksi tunggal, prediksi batch (CSV), riwayat, dan dashboard,
+          lalu dirilis ke publik. Hasil penelitiannya juga ditulis ulang jadi artikel jurnal format IMRaD dan diajukan
+          untuk publikasi internasional.
+        </p>
+        <div class="stack">
+          <span>Python</span><span>IndoBERT</span><span>TF-IDF</span><span>Streamlit</span><span>Hugging Face</span>
+        </div>
+        <div class="unit-links">
+          <a href="#" target="_blank" rel="noopener">streamlit app →</a>
+          <a href="#" target="_blank" rel="noopener">model di hugging face →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="unit">
+      <div class="unit-tag"><span class="id">RACK 02</span><span class="status-chip completed"><i></i>completed</span></div>
+      <div>
+        <h3>PKL Pusdatin BASARNAS — Infrastruktur &amp; Keamanan Jaringan</h3>
+        <p>
+          Praktik kerja lapangan di divisi Pusdatin BASARNAS, menangani infrastruktur jaringan, monitoring CCTV
+          berbasis WLAN, setup server Nutanix &amp; Ubuntu, latihan dasar keamanan siber lewat OverTheWire Bandit,
+          serta pencatatan aset IT dan pengarsipan digital. Hasil kerja dirangkum dan dipresentasikan dalam sidang
+          PKL memakai slide 14 halaman dengan palet warna khas instansi pemerintah/SAR.
+        </p>
+        <div class="stack">
+          <span>Jaringan WLAN</span><span>Nutanix</span><span>Ubuntu Server</span><span>Linux Security</span><span>Dokumentasi</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="unit">
+      <div class="unit-tag"><span class="id">RACK 03</span><span class="status-chip completed"><i></i>completed</span></div>
+      <div>
+        <h3>IT Networking Intern — Kominfotik Jakarta Timur</h3>
+        <p>
+          Mengelola operasional Wi-Fi &amp; internet gedung, troubleshooting jaringan responsif untuk menekan
+          downtime, serta mendukung instalasi dan konfigurasi perangkat Switch/Router dan infrastruktur
+          audio-visual untuk rapat rutin.
+        </p>
+        <div class="stack"><span>Switch/Router</span><span>Troubleshooting</span><span>Zoom AV Setup</span></div>
+      </div>
+    </div>
+
+    <div class="unit">
+      <div class="unit-tag"><span class="id">RACK 04</span><span class="status-chip deployed"><i></i>deployed</span></div>
+      <div>
+        <h3>Website Laravel — Export PDF &amp; Visualisasi Data</h3>
+        <p>
+          Aplikasi web berbasis Laravel dengan fitur export laporan ke PDF dan visualisasi data dalam bentuk chart,
+          dibangun untuk melatih alur kerja full-stack dari database sampai tampilan akhir.
+        </p>
+        <div class="stack"><span>Laravel</span><span>PHP</span><span>Chart.js</span><span>PDF Export</span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="wrap reveal">
+  <div class="section-head">
+    <div class="eyebrow">./contact</div>
+    <h2>Open a <span>Ticket</span></h2>
+  </div>
+  <div class="ticket">
+    <div class="field">
+      <div class="k">Email</div>
+      <div class="v"><a href="mailto:naufaladitya4205@gmail.com">naufaladitya4205@gmail.com</a></div>
+    </div>
+    <div class="field">
+      <div class="k">Telepon</div>
+      <div class="v">085784176704</div>
+    </div>
+    <div class="field">
+      <div class="k">LinkedIn</div>
+      <div class="v"><a href="https://www.linkedin.com/in/naufal-aditya-205103296" target="_blank" rel="noopener">linkedin.com/in/naufal-aditya</a></div>
+    </div>
+    <div class="field">
+      <div class="k">Lokasi</div>
+      <div class="v">Jakarta Timur, Indonesia</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="led">●</span> system status: all services operational &middot; © 2026 Naufal Aditya Putra
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+<script>
+  // Smooth scroll (Lenis)
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && window.Lenis) {
+    const lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+    function raf(time){ lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener('click', e=>{
+        const target = document.querySelector(a.getAttribute('href'));
+        if(target){ e.preventDefault(); lenis.scrollTo(target, { offset: -70 }); }
+      });
+    });
+  }
+
+  // Terminal typewriter
+  const lines = [
+    { p:'$ whoami', o:'naufal_aditya_putra' },
+    { p:'$ status --role', o:'IT Support · Networking · Web Developer' },
+    { p:'$ cat mission.txt', o:'Membangun solusi teknologi yang stabil, terukur, dan gampang dipakai.' },
+  ];
+  const body = document.getElementById('termBody');
+  let li = 0;
+
+  function typeLine(prompt, output, cb){
+    const pEl = document.createElement('div'); pEl.className='line';
+    const pSpan = document.createElement('span'); pSpan.className='prompt';
+    pEl.appendChild(pSpan); body.appendChild(pEl);
+    let i=0;
+    (function tp(){
+      if(i<=prompt.length){ pSpan.textContent = prompt.slice(0,i); i++; setTimeout(tp,28); }
+      else {
+        const oEl = document.createElement('div'); oEl.className='line out'; oEl.textContent='';
+        body.appendChild(oEl);
+        let j=0;
+        (function to(){
+          if(j<=output.length){ oEl.textContent = output.slice(0,j); j++; setTimeout(to,12); }
+          else cb();
+        })();
+      }
+    })();
+  }
+
+  function runSeq(){
+    if(li >= lines.length){
+      const c = document.createElement('span'); c.className='cursor';
+      body.appendChild(c);
+      return;
+    }
+    typeLine(lines[li].p, lines[li].o, ()=>{ li++; setTimeout(runSeq, 220); });
+  }
+  runSeq();
+
+  // Scroll reveal
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in-view'); io.unobserve(e.target); } });
+  }, { threshold:.15 });
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+
+</body>
+</html>

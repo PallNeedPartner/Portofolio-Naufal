@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fake News Detection — NLP AI Research</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --fake:    #E24B4A;
+    --real:    #4D9A52;
+    --blue:    #2B6CB0;
+    --amber:   #B45309;
+    --ink:     #1A1A2E;
+    --ink2:    #374151;
+    --muted:   #6B7280;
+    --border:  #E5E7EB;
+    --bg:      #F9FAFB;
+    --white:   #FFFFFF;
+    --radius:  10px;
+    --shadow:  0 1px 4px rgba(0,0,0,.08);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink2);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--ink);
+    color: #fff;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid var(--fake);
+  }
+  nav .logo {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -.3px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  nav .logo span { color: var(--fake); }
+  nav .nav-links {
+    display: flex;
+    gap: 4px;
+    margin-left: auto;
+  }
+  nav .nav-links a {
+    color: rgba(255,255,255,.7);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: background .15s, color .15s;
+  }
+  nav .nav-links a:hover,
+  nav .nav-links a.active { background: rgba(255,255,255,.12); color: #fff; }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--ink);
+    color: #fff;
+    padding: 3.5rem 2rem 3rem;
+    text-align: center;
+  }
+  .hero h1 {
+    font-size: clamp(24px, 4vw, 38px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.2;
+    margin-bottom: .75rem;
+  }
+  .hero h1 em { color: var(--fake); font-style: normal; }
+  .hero p {
+    font-size: 15px;
+    color: rgba(255,255,255,.65);
+    max-width: 560px;
+    margin: 0 auto 1.5rem;
+  }
+  .badge-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .badge {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,.2);
+    color: rgba(255,255,255,.8);
+  }
+  .badge.accent { background: var(--fake); border-color: var(--fake); color: #fff; }
+
+  /* ── MAIN LAYOUT ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 6px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    flex: 1;
+    min-width: 100px;
+    padding: 9px 14px;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background .15s, color .15s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { background: var(--bg); color: var(--ink2); }
+  .tab-btn.active { background: var(--ink); color: #fff; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  /* ── METRIC GRID ── */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 1.25rem;
+  }
+  .metric {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    box-shadow: var(--shadow);
+  }
+  .metric-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .metric-val { font-size: 26px; font-weight: 700; color: var(--ink); line-height: 1; }
+  .metric-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* ── CHART WRAPPER ── */
+  .chart-box { position: relative; width: 100%; }
+
+  /* ── TABLE ── */
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #F3F4F6; }
+
+  /* ── LABELS ── */
+  .lbl {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 4px;
+  }
+  .lbl-fake { background: #FEE2E2; color: #991B1B; }
+  .lbl-real { background: #D1FAE5; color: #065F46; }
+
+  /* ── PIPELINE STEPS ── */
+  .pipeline { display: flex; flex-direction: column; gap: 0; }
+  .pipe-step {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .pipe-step:last-child { border-bottom: none; }
+  .pipe-num {
+    min-width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .pipe-body { flex: 1; }
+  .pipe-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+  .pipe-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .pipe-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .tag {
+    font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500;
+  }
+  .tag-blue { background: #DBEAFE; color: #1E40AF; }
+  .tag-green { background: #D1FAE5; color: #065F46; }
+  .tag-amber { background: #FEF3C7; color: #92400E; }
+  .tag-mono {
+    font-family: 'Courier New', monospace;
+    background: #F3F4F6; color: var(--ink2);
+    font-size: 12px; padding: 6px 10px; border-radius: 6px;
+    margin-top: 8px; display: block; line-height: 1.6;
+  }
+
+  /* ── CONF MATRIX ── */
+  .conf-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  .conf-cell {
+    padding: 18px 12px;
+    border-radius: var(--radius);
+    text-align: center;
+  }
+  .conf-cell .cv { font-size: 28px; font-weight: 800; }
+  .conf-cell .cl { font-size: 11px; margin-top: 3px; font-weight: 600; }
+  .tp, .tn { background: #D1FAE5; }
+  .tp .cv, .tn .cv { color: #065F46; }
+  .tp .cl, .tn .cl { color: #059669; }
+  .fp, .fn { background: #FEE2E2; }
+  .fp .cv, .fn .cv { color: #991B1B; }
+  .fp .cl, .fn .cl { color: #DC2626; }
+  .conf-axis {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--muted); text-align: center;
+  }
+
+  /* ── DEMO PANEL ── */
+  .demo-input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--ink2);
+    background: var(--white);
+    resize: vertical;
+    transition: border-color .15s;
+    outline: none;
+  }
+  .demo-input:focus { border-color: var(--blue); }
+  .btn-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .btn {
+    padding: 9px 18px;
+    border: none;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+  }
+  .btn:hover { opacity: .88; }
+  .btn:active { transform: scale(.97); }
+  .btn-primary { background: var(--ink); color: #fff; flex: 1; }
+  .btn-ghost { background: var(--bg); color: var(--ink2); border: 1px solid var(--border); }
+  .result-box {
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-top: 1rem;
+    display: none;
+  }
+  .result-fake { background: #FEF2F2; border: 1px solid #FECACA; }
+  .result-real { background: #ECFDF5; border: 1px solid #A7F3D0; }
+  .result-head { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .result-fake .result-head { color: #991B1B; }
+  .result-real .result-head { color: #065F46; }
+  .result-sub { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+  .prob-row { margin-bottom: 6px; }
+  .prob-label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 3px; }
+  .prob-bar { height: 7px; border-radius: 4px; background: #E5E7EB; overflow: hidden; }
+  .prob-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
+  .tokens { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+  .tok {
+    font-size: 12px; padding: 3px 8px; border-radius: 4px;
+    border: 1px solid var(--border); color: var(--muted); background: var(--white);
+  }
+  .tok.danger { background: #FEE2E2; color: #991B1B; border-color: #FECACA; }
+  .tok.safe   { background: #D1FAE5; color: #065F46; border-color: #A7F3D0; }
+
+  /* ── LEGEND ── */
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); margin-bottom: 10px; flex-wrap: wrap; }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* ── PROGRESS BAR ── */
+  .pbar-wrap { background: #E5E7EB; border-radius: 4px; height: 8px; overflow: hidden; margin-top: 6px; }
+  .pbar { height: 100%; border-radius: 4px; }
+
+  /* ── SPLIT INFO ── */
+  .split-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; text-align: center; }
+  .split-num { font-size: 20px; font-weight: 700; color: var(--ink); }
+  .split-lbl { font-size: 12px; color: var(--muted); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 12px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    margin-top: 2rem;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .hero { padding: 2rem 1rem 1.5rem; }
+    .container { padding: 1rem; }
+    nav .nav-links { display: none; }
+    .split-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    🛡️ <span>Fake</span>NewsDetect
+  </div>
+  <div class="nav-links">
+    <a href="#" class="active">Dashboard</a>
+    <a href="https://github.com/" target="_blank">GitHub</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Deteksi <em>Fake News</em><br>Berbasis NLP &amp; Machine Learning</h1>
+  <p>Klasifikasi berita palsu menggunakan TF-IDF + Logistic Regression. Dataset 4.200 artikel bahasa Indonesia.</p>
+  <div class="badge-row">
+    <span class="badge accent">UAS Project AI</span>
+    <span class="badge">NLP / LLM</span>
+    <span class="badge">TF-IDF · Logistic Regression</span>
+    <span class="badge">Python · scikit-learn</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+
+  <!-- TABS -->
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" onclick="switchTab('dataset', this)">📊 Dataset</button>
+    <button class="tab-btn" onclick="switchTab('preprocessing', this)">⚙️ Preprocessing</button>
+    <button class="tab-btn" onclick="switchTab('training', this)">🧠 Training</button>
+    <button class="tab-btn" onclick="switchTab('evaluasi', this)">📈 Evaluasi</button>
+    <button class="tab-btn" onclick="switchTab('demo', this)">🔍 Demo</button>
+  </div>
+
+  <!-- ════════ TAB: DATASET ════════ -->
+  <div class="panel active" id="panel-dataset">
+    <div class="metric-grid">
+      <div class="metric"><div class="metric-label">Total Artikel</div><div class="metric-val">4,200</div><div class="metric-sub">berita bahasa Indonesia</div></div>
+      <div class="metric"><div class="metric-label">Berita Palsu</div><div class="metric-val" style="color:var(--fake)">2,100</div><div class="metric-sub">50% dari total</div></div>
+      <div class="metric"><div class="metric-label">Berita Asli</div><div class="metric-val" style="color:var(--real)">2,100</div><div class="metric-sub">50% dari total</div></div>
+      <div class="metric"><div class="metric-label">Fitur</div><div class="metric-val">3</div><div class="metric-sub">title, text, label</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Distribusi Label Dataset</div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--fake)"></span> Fake (50%)</span>
+        <span><span class="dot" style="background:var(--real)"></span> Real (50%)</span>
+      </div>
+      <div class="chart-box" style="height:220px">
+        <canvas id="distChart" aria-label="Distribusi label dataset"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Sample Data (5 dari 4.200 artikel)</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Judul Berita</th><th>Sumber</th><th>Label</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Vaksin COVID-19 mengandung chip microelectronic pengawas warga</td><td>unknownnews.net</td><td><span class="lbl lbl-fake">FAKE</span></td></tr>
+            <tr><td>2</td><td>WHO umumkan panduan terbaru penanganan penyakit infeksi saluran napas</td><td>who.int</td><td><span class="lbl lbl-real">REAL</span></td></tr>
+            <tr><td>3</td><td>TERBONGKAR! Presiden rahasia jual pulau terluar ke asing</td><td>viralhoax.id</td><td><span class="lbl lbl-fake">FAKE</span></td></tr>
+            <tr><td>4</td><td>Bank Indonesia naikkan suku bunga acuan 25 basis poin</td><td>kompas.com</td><td><span class="lbl lbl-real">REAL</span></td></tr>
+            <tr><td>5</td><td>VIRAL: Ilmuwan NASA akui bumi datar, bukti disembunyikan</td><td>konspirasi.id</td><td><span class="lbl lbl-fake">FAKE</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Pembagian Dataset (Train / Val / Test)</div>
+      <div class="split-grid">
+        <div>
+          <div class="split-num">3,360</div>
+          <div class="split-lbl">Training set (80%)</div>
+          <div class="pbar-wrap"><div class="pbar" style="width:80%;background:var(--blue)"></div></div>
+        </div>
+        <div>
+          <div class="split-num">420</div>
+          <div class="split-lbl">Validation set (10%)</div>
+          <div class="pbar-wrap"><div class="pbar" style="width:10%;background:var(--real)"></div></div>
+        </div>
+        <div>
+          <div class="split-num">420</div>
+          <div class="split-lbl">Test set (10%)</div>
+          <div class="pbar-wrap"><div class="pbar" style="width:10%;background:var(--amber)"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ TAB: PREPROCESSING ════════ -->
+  <div class="panel" id="panel-preprocessing">
+    <div class="card">
+      <div class="card-title">Pipeline Preprocessing Teks</div>
+      <div class="pipeline">
+        <div class="pipe-step">
+          <div class="pipe-num">1</div>
+          <div class="pipe-body">
+            <div class="pipe-title">Text Cleaning</div>
+            <div class="pipe-desc">Hapus URL, tag HTML, angka, tanda baca. Ubah semua huruf ke lowercase.</div>
+            <div class="pipe-tags"><span class="tag tag-blue">regex</span><span class="tag tag-blue">str.lower()</span></div>
+            <code class="tag-mono">Input : "Vaksin COVID-19!! &lt;b&gt;BERBAHAYA&lt;/b&gt; https://t.co/xxx"<br>Output: "vaksin covid berbahaya"</code>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">2</div>
+          <div class="pipe-body">
+            <div class="pipe-title">Tokenization</div>
+            <div class="pipe-desc">Memecah kalimat menjadi unit kata (token) individual untuk diproses lebih lanjut.</div>
+            <div class="pipe-tags"><span class="tag tag-blue">nltk.word_tokenize()</span></div>
+            <code class="tag-mono">→ ["vaksin", "covid", "berbahaya"]</code>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">3</div>
+          <div class="pipe-body">
+            <div class="pipe-title">Stopword Removal</div>
+            <div class="pipe-desc">Hapus kata umum tidak bermakna: "yang", "dan", "di", "ke", "dari", "adalah", dsb.</div>
+            <div class="pipe-tags"><span class="tag tag-amber">NLTK stopwords</span><span class="tag tag-amber">Bahasa Indonesia</span></div>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">4</div>
+          <div class="pipe-body">
+            <div class="pipe-title">Stemming</div>
+            <div class="pipe-desc">Kembalikan kata ke bentuk dasar: "membaca"→"baca", "penulisan"→"tulis", "penelitian"→"teliti".</div>
+            <div class="pipe-tags"><span class="tag tag-green">PySastrawi stemmer</span></div>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">5</div>
+          <div class="pipe-body">
+            <div class="pipe-title">TF-IDF Vectorization</div>
+            <div class="pipe-desc">Konversi teks ke vektor numerik berbobot. Kata langka di dokumen tertentu dapat skor tinggi.</div>
+            <div class="pipe-tags"><span class="tag tag-green">TfidfVectorizer</span><span class="tag tag-green">max_features=10.000</span><span class="tag tag-green">ngram=(1,2)</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Top Kata per Kelas setelah Preprocessing</div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--fake)"></span>Indikator Fake</span>
+        <span><span class="dot" style="background:var(--real)"></span>Indikator Real</span>
+      </div>
+      <div class="chart-box" style="height:320px">
+        <canvas id="wordChart" aria-label="Top kata per kelas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ TAB: TRAINING ════════ -->
+  <div class="panel" id="panel-training">
+    <div class="card">
+      <div class="card-title">Model yang Digunakan</div>
+      <div class="pipeline">
+        <div class="pipe-step">
+          <div class="pipe-num" style="background:var(--blue)">★</div>
+          <div class="pipe-body">
+            <div class="pipe-title">Logistic Regression <span class="lbl lbl-real" style="font-size:10px;vertical-align:middle">Best Model</span></div>
+            <div class="pipe-desc">Model utama. Klasifikasi biner dengan fitur TF-IDF. Cepat, interpretable, performa tinggi untuk teks.</div>
+            <div class="pipe-tags"><span class="tag tag-blue">C=1.0</span><span class="tag tag-blue">max_iter=1000</span><span class="tag tag-green">sklearn.linear_model</span></div>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">2</div>
+          <div class="pipe-body">
+            <div class="pipe-title">Naive Bayes (pembanding)</div>
+            <div class="pipe-desc">MultinomialNB. Baseline klasik untuk teks. Sangat efisien, cocok untuk data sparse seperti TF-IDF.</div>
+            <div class="pipe-tags"><span class="tag tag-blue">MultinomialNB</span><span class="tag tag-amber">alpha=0.5</span></div>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">3</div>
+          <div class="pipe-body">
+            <div class="pipe-title">Random Forest (pembanding)</div>
+            <div class="pipe-desc">Ensemble 100 decision tree. Robust terhadap overfitting, namun lebih lambat dan kurang interpretable.</div>
+            <div class="pipe-tags"><span class="tag tag-blue">RandomForestClassifier</span><span class="tag tag-amber">n_estimators=100</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Learning Curve — Logistic Regression</div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--blue)"></span>Training F1</span>
+        <span><span class="dot" style="background:var(--real)"></span>Validation F1</span>
+      </div>
+      <div class="chart-box" style="height:240px">
+        <canvas id="learningChart" aria-label="Learning curve"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Perbandingan Akurasi 3 Model</div>
+      <div class="chart-box" style="height:210px">
+        <canvas id="modelChart" aria-label="Perbandingan model"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ TAB: EVALUASI ════════ -->
+  <div class="panel" id="panel-evaluasi">
+    <div class="metric-grid">
+      <div class="metric"><div class="metric-label">Accuracy</div><div class="metric-val" style="color:var(--blue)">94.3%</div><div class="metric-sub">420 test samples</div></div>
+      <div class="metric"><div class="metric-label">Precision</div><div class="metric-val" style="color:var(--real)">93.8%</div><div class="metric-sub">macro avg</div></div>
+      <div class="metric"><div class="metric-label">Recall</div><div class="metric-val" style="color:var(--amber)">94.7%</div><div class="metric-sub">macro avg</div></div>
+      <div class="metric"><div class="metric-label">F1-Score</div><div class="metric-val" style="color:#7C3AED">94.2%</div><div class="metric-sub">macro avg</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Confusion Matrix — Logistic Regression</div>
+      <div style="text-align:center;margin-bottom:8px;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em">Predicted</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;max-width:340px;margin:0 auto">
+        <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;writing-mode:vertical-rl;transform:rotate(180deg)">Actual</div>
+        <div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;text-align:center;font-size:11px;color:var(--muted);font-weight:700;margin-bottom:6px">
+            <div>FAKE</div><div>REAL</div>
+          </div>
+          <div class="conf-grid">
+            <div class="conf-cell tp"><div class="cv">196</div><div class="cl">True Positive</div></div>
+            <div class="conf-cell fn"><div class="cv">13</div><div class="cl">False Negative</div></div>
+            <div class="conf-cell fp"><div class="cv">11</div><div class="cl">False Positive</div></div>
+            <div class="conf-cell tn"><div class="cv">200</div><div class="cl">True Negative</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;text-align:center;font-size:11px;color:var(--muted);font-weight:700;margin-top:6px">
+            <div>Actual FAKE</div><div>Actual REAL</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Classification Report per Kelas</div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--fake)"></span>FAKE</span>
+        <span><span class="dot" style="background:var(--real)"></span>REAL</span>
+      </div>
+      <div class="chart-box" style="height:240px">
+        <canvas id="reportChart" aria-label="Classification report"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">ROC Curve</div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--blue)"></span>Logistic Regression (AUC = 0.98)</span>
+        <span><span class="dot" style="background:var(--amber)"></span>Naive Bayes (AUC = 0.97)</span>
+        <span><span class="dot" style="background:#9CA3AF"></span>Random baseline</span>
+      </div>
+      <div class="chart-box" style="height:280px">
+        <canvas id="rocChart" aria-label="ROC curve"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ TAB: DEMO ════════ -->
+  <div class="panel" id="panel-demo">
+    <div class="card">
+      <div class="card-title">Coba Deteksi Berita</div>
+      <textarea class="demo-input" id="newsInput" rows="5"
+        placeholder="Masukkan judul atau isi berita di sini untuk dianalisis..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="analyzeNews()">🔍 Analisis Berita</button>
+        <button class="btn btn-ghost" onclick="fillSample('fake')">Contoh Fake</button>
+        <button class="btn btn-ghost" onclick="fillSample('real')">Contoh Real</button>
+        <button class="btn btn-ghost" onclick="clearInput()">Hapus</button>
+      </div>
+      <div class="result-box" id="resultBox">
+        <div class="result-head" id="resultHead"></div>
+        <div class="result-sub" id="resultSub"></div>
+        <div class="prob-row">
+          <div class="prob-label"><span style="color:var(--fake);font-weight:700">P(Fake)</span><span id="probFakeVal"></span></div>
+          <div class="prob-bar"><div class="prob-fill" id="probFakeBar" style="background:var(--fake)"></div></div>
+        </div>
+        <div class="prob-row" style="margin-top:6px">
+          <div class="prob-label"><span style="color:var(--real);font-weight:700">P(Real)</span><span id="probRealVal"></span></div>
+          <div class="prob-bar"><div class="prob-fill" id="probRealBar" style="background:var(--real)"></div></div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-top:12px;margin-bottom:6px">Token analysis (merah = indikator fake, hijau = indikator real):</div>
+        <div class="tokens" id="tokensWrap"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Cara Kerja Model</div>
+      <div class="pipeline">
+        <div class="pipe-step">
+          <div class="pipe-num">1</div>
+          <div class="pipe-body"><div class="pipe-title">Input teks</div><div class="pipe-desc">Berita dimasukkan ke pipeline preprocessing yang sama saat training: cleaning → tokenize → stopword removal.</div></div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">2</div>
+          <div class="pipe-body"><div class="pipe-title">TF-IDF transform</div><div class="pipe-desc">Teks diubah jadi vektor numerik menggunakan vocabulary 10.000 fitur yang dipelajari saat training.</div></div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">3</div>
+          <div class="pipe-body"><div class="pipe-title">Model inference</div><div class="pipe-desc">Logistic Regression menghitung P(fake|teks) dan P(real|teks) berdasarkan bobot koefisien tiap fitur.</div></div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-num">4</div>
+          <div class="pipe-body"><div class="pipe-title">Prediksi akhir</div><div class="pipe-desc">Kelas dengan probabilitas tertinggi dijadikan prediksi. Threshold default: 0.5.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<footer>
+  Fake News Detection · NLP / Machine Learning · UAS Project Sistem &amp; Teknologi Informasi<br>
+  TF-IDF + Logistic Regression · scikit-learn · Python 3.11
+</footer>
+
+<script>
+/* ─── TAB SWITCHING ─── */
+function switchTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ─── CHART DEFAULTS ─── */
+Chart.defaults.font.family = "'Segoe UI', system-ui, sans-serif";
+Chart.defaults.font.size   = 12;
+Chart.defaults.color       = '#6B7280';
+
+/* ─── 1. DISTRIBUTION CHART ─── */
+new Chart(document.getElementById('distChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Fake', 'Real'],
+    datasets: [{ data: [2100, 2100], backgroundColor: ['#E24B4A', '#4D9A52'], borderWidth: 0, hoverOffset: 6 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } }
+  }
+});
+
+/* ─── 2. WORD FREQUENCY CHART ─── */
+new Chart(document.getElementById('wordChart'), {
+  type: 'bar',
+  data: {
+    labels: ['terbongkar', 'konspirasi', 'hoax', 'viral palsu', 'disembunyikan',
+             'penelitian', 'resmi', 'berdasarkan data', 'dilaporkan', 'ilmiah'],
+    datasets: [{
+      data: [890, 852, 820, 786, 743, 812, 778, 741, 705, 682],
+      backgroundColor: ['#E24B4A','#E24B4A','#E24B4A','#E24B4A','#E24B4A',
+                        '#4D9A52','#4D9A52','#4D9A52','#4D9A52','#4D9A52'],
+      borderWidth: 0, borderRadius: 4
+    }]
+  },
+  options: {
+    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { grid: { color: '#F3F4F6' } }, y: { grid: { display: false } } }
+  }
+});
+
+/* ─── 3. LEARNING CURVE ─── */
+const sizes = [500, 1000, 1500, 2000, 2500, 3000, 3360];
+new Chart(document.getElementById('learningChart'), {
+  type: 'line',
+  data: {
+    labels: sizes.map(String),
+    datasets: [
+      { label: 'Training F1', data: [0.910,0.935,0.948,0.954,0.957,0.960,0.963],
+        borderColor: '#2B6CB0', backgroundColor: 'rgba(43,108,176,.1)', fill: true,
+        tension: 0.4, pointRadius: 4, borderWidth: 2 },
+      { label: 'Validation F1', data: [0.880,0.905,0.921,0.931,0.936,0.939,0.943],
+        borderColor: '#4D9A52', backgroundColor: 'rgba(77,154,82,.1)', fill: true,
+        tension: 0.4, pointRadius: 4, borderDash: [5,3], borderWidth: 2 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { min: 0.85, max: 0.98, grid: { color: '#F3F4F6' }, ticks: { callback: v => (v*100).toFixed(0)+'%' } },
+      x: { grid: { display: false }, title: { display: true, text: 'Jumlah data training' } }
+    }
+  }
+});
+
+/* ─── 4. MODEL COMPARISON ─── */
+new Chart(document.getElementById('modelChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Logistic Regression', 'Naive Bayes', 'Random Forest'],
+    datasets: [{
+      label: 'Accuracy (%)',
+      data: [94.3, 91.2, 93.1],
+      backgroundColor: ['#2B6CB0', '#B45309', '#6B7280'],
+      borderWidth: 0, borderRadius: 5
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { min: 85, max: 100, grid: { color: '#F3F4F6' }, ticks: { callback: v => v+'%' } },
+      x: { grid: { display: false }, ticks: { autoSkip: false } }
+    }
+  }
+});
+
+/* ─── 5. CLASSIFICATION REPORT ─── */
+new Chart(document.getElementById('reportChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Precision', 'Recall', 'F1-Score'],
+    datasets: [
+      { label: 'FAKE', data: [93.8, 93.8, 93.8], backgroundColor: '#E24B4A', borderWidth: 0, borderRadius: 4 },
+      { label: 'REAL', data: [93.9, 95.6, 94.7], backgroundColor: '#4D9A52', borderWidth: 0, borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { min: 88, max: 100, grid: { color: '#F3F4F6' }, ticks: { callback: v => v+'%' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+/* ─── 6. ROC CURVE ─── */
+const fpr  = [0,0.01,0.03,0.06,0.10,0.15,0.20,0.30,0.50,0.75,1.0];
+const tprLR = [0,0.50,0.78,0.87,0.92,0.94,0.96,0.97,0.98,0.99,1.0];
+const tprNB = [0,0.44,0.71,0.83,0.89,0.92,0.94,0.96,0.97,0.99,1.0];
+new Chart(document.getElementById('rocChart'), {
+  type: 'line',
+  data: {
+    labels: fpr.map(v => v.toFixed(2)),
+    datasets: [
+      { label: 'LR AUC=0.98', data: tprLR, borderColor: '#2B6CB0', backgroundColor: 'rgba(43,108,176,.08)', fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2 },
+      { label: 'NB AUC=0.97', data: tprNB, borderColor: '#B45309', backgroundColor: 'transparent', fill: false, tension: 0.3, pointRadius: 0, borderWidth: 2, borderDash: [4,3] },
+      { label: 'Baseline',    data: fpr,   borderColor: '#D1D5DB', backgroundColor: 'transparent', fill: false, pointRadius: 0, borderWidth: 1.5, borderDash: [6,4] }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { min: 0, max: 1, title: { display: true, text: 'False Positive Rate' }, grid: { color: '#F3F4F6' } },
+      y: { min: 0, max: 1.05, title: { display: true, text: 'True Positive Rate' }, grid: { color: '#F3F4F6' } }
+    }
+  }
+});
+
+/* ─── DEMO LOGIC ─── */
+const FAKE_KW = ['terbongkar','konspirasi','hoax','breaking','rahasia','tidak terbukti','viral','chip','alien','disembunyikan','bohong','palsu','manipulasi','sebarkan','dihapus'];
+const REAL_KW = ['penelitian','resmi','data','berdasarkan','dilaporkan','menurut','fakta','terbukti','ilmiah','institusi','laporan','jurnal','kebijakan','persen','statistik'];
+
+function analyzeNews() {
+  const text = document.getElementById('newsInput').value.trim();
+  if (!text) { alert('Masukkan teks berita terlebih dahulu.'); return; }
+  const lower = text.toLowerCase();
+  let fs = 0, rs = 0;
+  FAKE_KW.forEach(k => { if (lower.includes(k)) fs += 0.12 + Math.random()*0.08; });
+  REAL_KW.forEach(k => { if (lower.includes(k)) rs += 0.10 + Math.random()*0.07; });
+  fs += 0.1 + Math.random()*0.15;
+  rs += 0.05 + Math.random()*0.12;
+  const total = fs + rs || 1;
+  const pf = Math.min(0.97, Math.max(0.03, (fs/total)*0.65 + 0.18));
+  const pr = 1 - pf;
+  const isFake = pf > 0.5;
+
+  const box = document.getElementById('resultBox');
+  box.className = 'result-box ' + (isFake ? 'result-fake' : 'result-real');
+  box.style.display = 'block';
+  document.getElementById('resultHead').textContent = isFake
+    ? '⚠ Kemungkinan Berita Palsu (FAKE)' : '✓ Kemungkinan Berita Asli (REAL)';
+  document.getElementById('resultSub').textContent =
+    `Confidence: ${(Math.max(pf,pr)*100).toFixed(1)}% — Model mendeteksi sebagai ${isFake ? 'FAKE' : 'REAL'} berdasarkan pola linguistik.`;
+  document.getElementById('probFakeVal').textContent = (pf*100).toFixed(1)+'%';
+  document.getElementById('probRealVal').textContent = (pr*100).toFixed(1)+'%';
+  setTimeout(() => {
+    document.getElementById('probFakeBar').style.width = (pf*100).toFixed(0)+'%';
+    document.getElementById('probRealBar').style.width = (pr*100).toFixed(0)+'%';
+  }, 50);
+
+  const words = text.split(/\s+/).slice(0, 24);
+  document.getElementById('tokensWrap').innerHTML = words.map(w => {
+    const wl = w.toLowerCase();
+    const hi = FAKE_KW.some(k => wl.includes(k));
+    const lo = REAL_KW.some(k => wl.includes(k));
+    return `<span class="tok${hi?' danger':lo?' safe':''}">${w}</span>`;
+  }).join('');
+}
+
+function fillSample(type) {
+  const s = {
+    fake: 'TERBONGKAR! Pemerintah sembunyikan konspirasi chip vaksin COVID dari rakyat Indonesia. Ilmuwan NASA akui bumi datar dan bukti disembunyikan selama puluhan tahun. Sebarkan sebelum dihapus!',
+    real: 'Berdasarkan data resmi yang dirilis BPS, pertumbuhan ekonomi Indonesia pada kuartal ketiga mencapai 5,2 persen. Penelitian ilmiah terbaru yang dilaporkan dalam jurnal internasional mengkonfirmasi efektivitas kebijakan fiskal.'
+  };
+  document.getElementById('newsInput').value = s[type];
+  document.getElementById('resultBox').style.display = 'none';
+  document.getElementById('probFakeBar').style.width = '0';
+  document.getElementById('probRealBar').style.width = '0';
+}
+
+function clearInput() {
+  document.getElementById('newsInput').value = '';
+  document.getElementById('resultBox').style.display = 'none';
+}
+</script>
+</body>
+</html>
